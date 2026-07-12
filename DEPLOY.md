@@ -35,6 +35,15 @@ Sudah disesuaikan untuk deploy: backend baca `DATABASE_URL` (SSL) & `CORS_ORIGIN
 2. Frontend dengan `VITE_API_BASE`.
 3. Update `CORS_ORIGINS` backend = URL frontend → redeploy.
 
+## Opsi Cepat — DEMO MODE (frontend-only, tanpa backend & DB)
+
+Buat live demo portfolio yang instan & selalu nyala (tanpa Render/Neon):
+1. Deploy **frontend saja** ke Vercel (root `frontend/`).
+2. **JANGAN set `VITE_API_BASE`** (atau set `VITE_DEMO=1`).
+3. App otomatis pakai data mock in-memory (`src/lib/mockApi.ts`) — alur daftar → konsultasi → farmasi jalan penuh. Data reset tiap reload (aman).
+
+> Kode backend tetap ada di repo (bukti skill full-stack), tapi demo publik ga perlu server hidup.
+
 ## 5. Demo login
 `admin/admin123` · `resepsionis/resepsionis123` · `dokter/dokter123` · `farmasi/farmasi123`
 

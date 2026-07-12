@@ -2,9 +2,12 @@
 // api.ts — koneksi ke backend Klinik Kulit (REST + JWT, token di localStorage)
 // =====================================================================
 
-const API_BASE =
-  ((import.meta as unknown as { env: { VITE_API_BASE?: string } }).env.VITE_API_BASE) ||
-  "http://localhost:3002/api";
+import { mockRequest } from "./mockApi";
+
+const ENV = (import.meta as unknown as { env: { VITE_API_BASE?: string; VITE_DEMO?: string } }).env;
+// DEMO aktif jika VITE_DEMO=1 ATAU tidak ada VITE_API_BASE (deploy frontend-only tanpa backend).
+export const DEMO = ENV.VITE_DEMO === "1" || !ENV.VITE_API_BASE;
+const API_BASE = ENV.VITE_API_BASE || "http://localhost:3002/api";
 const TOKEN_KEY = "klinik_token";
 const USER_KEY = "klinik_user";
 
@@ -24,6 +27,7 @@ export function clearAuth() {
 }
 
 export async function apiFetch<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
+  if (DEMO) return mockRequest<T>(path, options);
   const token = localStorage.getItem(TOKEN_KEY);
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
@@ -39,6 +43,14 @@ export async function apiFetch<T = unknown>(path: string, options: RequestInit =
 }
 
 export async function login(username: string, password: string): Promise<AuthUser> {
+  if (DEMO) {
+    const { token, user } = await mockRequest<{ token: string; user: AuthUser }>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    });
+    saveAuth(token, user);
+    return user;
+  }
   const res = await fetch(`${API_BASE}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
